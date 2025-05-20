@@ -1,3 +1,17 @@
+<?php
+// Include the database connection and utility functions
+require_once 'db_connection.php';
+require_once 'get_comments.php';
+
+// Gunakan fungsi tanpa mendefinisikannya ulang
+$article_id = 1; // Contoh, bisa dari $_GET atau lainnya
+
+$comments = getComments($article_id);
+$commentCount = countComments($article_id);
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -639,101 +653,98 @@
                     
                     <!-- Comments Section -->
                     <div class="comments-section">
-                        <h3 class="mb-4">Komentar (5)</h3>
+                        <h3 class="mb-4">Komentar (<?php echo $comment_count; ?>)</h3>
                         
-                        <!-- Comment 1 -->
-                        <div class="comment">
-                            <div class="d-flex">
-                                <div class="comment-avatar me-3">
-                                    <img src="/api/placeholder/60/60" alt="User Avatar" class="img-fluid">
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h5 class="mb-1">John Smith</h5>
-                                    <div class="comment-meta">
-                                        <span>April 29, 2025 at 10:30 AM</span>
-                                    </div>
-                                    <p>This is a fantastic overview of where AI is heading. I'm particularly interested in the ethical considerations you've highlighted. As these systems become more integrated into critical infrastructure, the governance frameworks will need to evolve rapidly.</p>
-                                    <button class="btn btn-sm btn-primary">Reply</button>
-                                </div>
+                        <?php if (empty($comments)): ?>
+                            <div class="alert alert-info">
+                                Belum ada komentar. Jadilah yang pertama untuk berkomentar!
                             </div>
-                            
-                            <!-- Reply to Comment 1 -->
-                            <div class="comment-reply">
-                                <div class="d-flex">
-                                    <div class="comment-avatar me-3">
-                                        <img src="/api/placeholder/60/60" alt="Admin Avatar" class="img-fluid">
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <h5 class="mb-1">Admin</h5>
-                                        <div class="comment-meta">
-                                            <span>April 29, 2025 at 11:45 AM</span>
+                        <?php else: ?>
+                            <?php foreach ($comments as $comment): ?>
+                                <?php if (!isset($comment['parent_comment_id'])): ?>
+                                    <!-- Comment -->
+                                    <div class="comment">
+                                        <div class="d-flex">
+                                            <div class="comment-avatar me-3">
+                                                <img src="/api/placeholder/60/60" alt="User Avatar" class="img-fluid">
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h5 class="mb-1"><?php echo htmlspecialchars($comment['name']); ?></h5>
+                                                <div class="comment-meta">
+                                                    <span><?php echo formatCommentDate($comment['comment_date']); ?></span>
+                                                </div>
+                                                <p><?php echo nl2br(htmlspecialchars($comment['comment_text'])); ?></p>
+                                                <button class="btn btn-sm btn-primary reply-btn" data-comment-id="<?php echo $comment['comment_id']; ?>">Reply</button>
+                                            </div>
                                         </div>
-                                        <p>Thanks for your thoughtful comment, John! You're absolutely right about governance frameworks. We're planning a follow-up article specifically on AI ethics and regulation that will dive deeper into this topic.</p>
-                                        <button class="btn btn-sm btn-primary">Reply</button>
+                                        
+                                        <?php
+                                        // Get replies to this comment
+                                        $replies = getReplies($comment['comment_id']);
+                                        foreach ($replies as $reply): 
+                                        ?>
+                                            <!-- Reply to Comment -->
+                                            <div class="comment-reply">
+                                                <div class="d-flex">
+                                                    <div class="comment-avatar me-3">
+                                                        <img src="/api/placeholder/60/60" alt="<?php echo $reply['is_admin'] ? 'Admin' : 'User'; ?> Avatar" class="img-fluid">
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <h5 class="mb-1"><?php echo $reply['is_admin'] ? 'Admin' : htmlspecialchars($reply['name']); ?></h5>
+                                                        <div class="comment-meta">
+                                                            <span><?php echo formatCommentDate($reply['comment_date']); ?></span>
+                                                        </div>
+                                                        <p><?php echo nl2br(htmlspecialchars($reply['comment_text'])); ?></p>
+                                                        <button class="btn btn-sm btn-primary reply-btn" data-comment-id="<?php echo $comment['comment_id']; ?>">Reply</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Comment 2 -->
-                        <div class="comment">
-                            <div class="d-flex">
-                                <div class="comment-avatar me-3">
-                                    <img src="/api/placeholder/60/60" alt="User Avatar" class="img-fluid">
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h5 class="mb-1">Sarah Johnson</h5>
-                                    <div class="comment-meta">
-                                        <span>April 28, 2025 at 3:15 PM</span>
-                                    </div>
-                                    <p>I work in healthcare, and we're just beginning to implement AI solutions for diagnostic assistance. The potential is enormous, but so are the challenges in terms of integration with existing workflows and ensuring that clinicians understand both the capabilities and limitations of these systems.</p>
-                                    <button class="btn btn-sm btn-primary">Reply</button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Comment 3 -->
-                        <div class="comment">
-                            <div class="d-flex">
-                                <div class="comment-avatar me-3">
-                                    <img src="/api/placeholder/60/60" alt="User Avatar" class="img-fluid">
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h5 class="mb-1">Michael Lee</h5>
-                                    <div class="comment-meta">
-                                        <span>April 28, 2025 at 9:22 AM</span>
-                                    </div>
-                                    <p>Great article! I'm curious about the future of edge AI. With more processing happening on local devices, do you think this will lead to more personalized AI experiences? Or will the limitations of edge computing restrict the types of models that can be deployed?</p>
-                                    <button class="btn btn-sm btn-primary">Reply</button>
-                                </div>
-                            </div>
-                        </div>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                         
                         <!-- Comment Form -->
                         <div class="comment-form">
                             <h4 class="mb-4">Tinggalkan Komentar</h4>
-                            <form>
+                            
+                            <!-- Alert for form submission status -->
+                            <?php if (isset($_GET['status']) && isset($_GET['message'])): ?>
+                                <div class="alert alert-<?php echo $_GET['status'] == 'success' ? 'success' : 'danger'; ?> mb-4" role="alert">
+                                    <?php echo htmlspecialchars($_GET['message']); ?>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <form action="comment_handler.php" method="POST" id="commentForm">
+                                <!-- Hidden field for article ID -->
+                                <input type="hidden" name="article_id" value="<?php echo $article_id; ?>">
+                                
+                                <!-- Hidden field for parent comment ID (for replies) -->
+                                <input type="hidden" name="parent_comment_id" id="parent_comment_id" value="">
+                                
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="name" class="form-label">Nama *</label>
-                                            <input type="text" class="form-control" id="name" required>
+                                            <input type="text" class="form-control" id="name" name="name" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="email" class="form-label">Email *</label>
-                                            <input type="email" class="form-control" id="email" required>
+                                            <input type="email" class="form-control" id="email" name="email" required>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="comment" class="form-label">Komentar *</label>
-                                    <textarea class="form-control" id="comment" rows="5" required></textarea>
+                                    <textarea class="form-control" id="comment" name="comment" rows="5" required></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Kirim Komentar</button>
                             </form>
-                        </div> 
+                        </div>
+                    </div>
                     </div> 
                 </div> 
             </div> 
@@ -792,5 +803,26 @@
       
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Simple script to handle reply functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const replyButtons = document.querySelectorAll('.reply-btn');
+        const commentForm = document.getElementById('commentForm');
+        const parentCommentIdField = document.getElementById('parent_comment_id');
+        
+        replyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const commentId = this.getAttribute('data-comment-id');
+                parentCommentIdField.value = commentId;
+                
+                // Scroll to form
+                commentForm.scrollIntoView({ behavior: 'smooth' });
+                
+                // Focus on comment textarea
+                document.getElementById('comment').focus();
+            });
+        });
+    });
+</script>
 </body>
 </html>
