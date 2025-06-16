@@ -1,0 +1,24 @@
+/* global.css - Global Color Scheme */
+
+:root {
+    --primary-color: #FF5A00;    /* Bright orange - energetic, powerful */
+    --secondary-color: #212529;  /* Dark gray/black - bold, serious */
+    --third-color: #D10000;      /* Dark red - aggressive, sporty */
+    --light-color: #FFFFFF;
+    --background-light: #f8f9fa;
+    --text-dark: #333333;
+    --text-light: #666666;
+    --border-color: #e9ecef;
+    --shadow-light: rgba(0,0,0,0.1);
+    --shadow-medium: rgba(0,0,0,0.15);
+    --shadow-dark: rgba(0,0,0,0.3);
+}
+
+/* Global color utilities */
+.text-primary { color: var(--primary-color) !important; }
+.text-secondary { color: var(--secondary-color) !important; }
+.text-third { color: var(--third-color) !important; }
+.bg-primary { background-color: var(--primary-color) !important; }
+.bg-secondary { background-color: var(--secondary-color) !important; }
+.bg-third { background-color: var(--third-color) !important; }
+.border-primary { border-color: var(--primary-color) !important; }
